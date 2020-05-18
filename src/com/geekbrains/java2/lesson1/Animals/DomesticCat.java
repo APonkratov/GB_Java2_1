@@ -1,4 +1,4 @@
-package Animals;
+package com.geekbrains.java2.lesson1.Animals;
 
 public class DomesticCat extends Cat{
     private String owner;

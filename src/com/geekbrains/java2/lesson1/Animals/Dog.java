@@ -1,4 +1,4 @@
-package Animals;
+package com.geekbrains.java2.lesson1.Animals;
 
 public class Dog extends Animal implements Jumping, Soundly {
     public static void main(String[] args) {

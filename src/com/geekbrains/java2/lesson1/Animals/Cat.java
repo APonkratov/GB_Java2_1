@@ -1,4 +1,4 @@
-package Animals;
+package com.geekbrains.java2.lesson1.Animals;
 
 public class Cat extends Animal implements Jumping, Soundly {
     Color color;

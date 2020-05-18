@@ -1,4 +1,4 @@
-package Animals;
+package com.geekbrains.java2.lesson1.Animals;
 
 public enum Color {
     RED("Рыжий",1),BLACK("Чёрный",10),GRAY("Серый",100),WHITE("Белый",1000),BROWN("Коричневый",10000);
