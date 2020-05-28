@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.java2.lesson4.homework4.fxchat.ChatSceneController">
+   <center>
+      <VBox>
+         <TextArea fx:id="messagesList" prefHeight="550.0" prefWidth="400.0" wrapText="true"/>
+         <HBox>
+            <TextField fx:id="messageField" prefHeight="50.0" prefWidth="300.0" promptText="Put your message here">
+               <HBox.margin>
+                  <Insets right="10.0"/>
+               </HBox.margin>
+            </TextField>
+            <Button fx:id="sendButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="80.0" text="Send">
+               <font>
+                  <Font name="System Bold" size="18.0"/>
+               </font>
+            </Button>
+         </HBox>
+      </VBox>
+   </center>
+</BorderPane>
