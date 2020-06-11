@@ -8,8 +8,8 @@ import java.net.Socket;
 public class ClientHandler {
     private MyServer myServer;
     private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private DataInputStream dataInputStream;
+    private DataOutputStream dataOutputStream;
     private String name;
 
     public String getName() {
@@ -21,9 +21,9 @@ public class ClientHandler {
         this.socket = socket;
         this.name = "";
         try {
-            this.in = new DataInputStream(socket.getInputStream());
-            this.out = new DataOutputStream(socket.getOutputStream());
-            new Thread(()-> {
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            new Thread(() -> {
                 try {
                     authenticate();
                     readMessages();
@@ -40,33 +40,37 @@ public class ClientHandler {
 
     private void closeConnection() {
         try {
-            in.close();
-            out.close();
+            dataInputStream.close();
+            dataOutputStream.close();
             socket.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         myServer.unsubscribe(this);
-        myServer.broadcast("User " + name + "left");
+        myServer.broadcast("User " + name + " left");
     }
 
     private void readMessages() throws IOException {
         while (true) {
-            if (in.available()>0) {
-                String message = in.readUTF();
+            if (dataInputStream.available() > 0) {
+                String message = dataInputStream.readUTF();
                 System.out.println("From " + name + ":" + message);
-                if (message.equals("/end")) {
+                if (message.startsWith("/w")) {
+                    String[] parts = message.split(" ", 3);
+                    myServer.sendDirectMessage(name, parts[1], parts[2]);
+                } else if (message.equals("/end")) {
                     return;
+                } else {
+                    myServer.broadcast(name + ": " + message);
                 }
-                myServer.broadcast(name + ": " + message);
             }
         }
     }
 
     private void authenticate() throws IOException {
-        while(true) {
-            if (in.available()>0){
-                String str = in.readUTF();
+        while (true) {
+            if (dataInputStream.available() > 0) {
+                String str = dataInputStream.readUTF();
                 if (str.startsWith("/auth")) {
                     String[] parts = str.split("\\s");
                     String nick = myServer.getAuthService().getNickByLoginAndPwd(parts[1], parts[2]);
@@ -94,7 +98,7 @@ public class ClientHandler {
 
     public void sendMsg(String s) {
         try {
-            out.writeUTF(s);
+            dataOutputStream.writeUTF(s);
         } catch (IOException e) {
             e.printStackTrace();
         }

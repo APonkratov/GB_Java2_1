@@ -1,7 +1,5 @@
 package com.geekbrains.java2.lesson7;
 
-import com.geekbrains.java2.lesson6.hw.Client;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,7 +29,7 @@ public class MyServer {
         } catch (IOException ex) {
             System.out.println("Server error");
         } finally {
-            if(authService!=null) {
+            if(authService != null) {
                 authService.stop();
             }
         }
@@ -59,5 +57,24 @@ public class MyServer {
             }
         }
         return false;
+    }
+
+    public void sendDirectMessage(String userFrom, String userTo, String message) {
+        if (isNickLogged(userTo)) {
+            for (ClientHandler client: clients) {
+                if (client.getName().equals(userTo)) {
+                    client.sendMsg(userFrom + " direct to you: " + message);
+                }
+                if (client.getName().equals(userFrom)) {
+                    client.sendMsg("You direct to " + userTo + ": " + message);
+                }
+            }
+        } else {
+            for (ClientHandler client: clients) {
+                if (client.getName().equals(userFrom)) {
+                    client.sendMsg("Server: " + userTo + " is offline now. Try later.");
+                }
+            }
+        }
     }
 }
