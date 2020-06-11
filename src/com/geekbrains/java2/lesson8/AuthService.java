@@ -23,25 +23,25 @@ public class AuthService {
 
     public AuthService() {
         userList = new ArrayList<>();
-//        userList.add(new User("login1", "pass1", "nick1"));
-//        userList.add(new User("login2", "pass2", "nick2"));
-//        userList.add(new User("login3", "pass3", "nick3"));
+        userList.add(new User("login1", "pass1", "nick1"));
+        userList.add(new User("login2", "pass2", "nick2"));
+        userList.add(new User("login3", "pass3", "nick3"));
 
-        try {
-            conn = DriverManager.
-                    getConnection("jdbc:h2:~/test", "sa", "");
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
-            while (rs.next()) {
-                String login = rs.getString("LOGIN");
-                String passwd = rs.getString("PASSWORD");
-                String nick = rs.getString("NICK");
-                userList.add(new User(login, passwd, nick));
-            }
-            rs.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+//        try {
+//            conn = DriverManager.
+//                    getConnection("jdbc:h2:~/test", "sa", "");
+//            Statement statement = conn.createStatement();
+//            ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
+//            while (rs.next()) {
+//                String login = rs.getString("LOGIN");
+//                String passwd = rs.getString("PASSWORD");
+//                String nick = rs.getString("NICK");
+//                userList.add(new User(login, passwd, nick));
+//            }
+//            rs.close();
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
 
 //        );
         // add application code here
