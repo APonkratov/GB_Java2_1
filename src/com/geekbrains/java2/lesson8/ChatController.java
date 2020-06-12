@@ -13,6 +13,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.io.DataInputStream;
@@ -28,9 +29,10 @@ public class ChatController implements Stageable {
     private DataInputStream in;
     private DataOutputStream out;
     private Thread readerThread;
+    private String chatText = "<body>";
 
     @FXML
-    TextArea messageArea;
+    WebView messageArea;
 
     @FXML
     TextField newMessage;
@@ -55,7 +57,17 @@ public class ChatController implements Stageable {
                                 break;
                             }
                             if(!strFromServer.startsWith("/")) {
-                                if (!strFromServer.startsWith(myNick+":")) Platform.runLater(()->{ messageArea.appendText(strFromServer + System.lineSeparator());});
+                                if (!strFromServer.startsWith(myNick+":")) {
+                                    if(strFromServer.startsWith("(direct)")) {
+                                        chatText += "<p style='background-color:powderblue;'>" +
+                                                strFromServer.substring(strFromServer.indexOf(")") + 2) + "</p>";
+                                    } else {
+                                        chatText += "<p>" + strFromServer + "</p>";
+                                    }
+                                    Platform.runLater(()->{
+                                        messageArea.getEngine().loadContent(chatText);
+                                    });
+                                }
                             } else if(strFromServer.startsWith("/clients ")) {
                                 updateClientsList(strFromServer);
                             }
@@ -110,7 +122,8 @@ public class ChatController implements Stageable {
         int selectedIndex = (Integer) nickList.getSelectionModel().getSelectedIndices().get(0);
         String messageText = newMessage.getText().trim();
         if(!messageText.isEmpty()) {
-            messageArea.appendText(messageText + System.lineSeparator());
+            chatText += "<p align='right'>" + messageText + "</p>";
+            messageArea.getEngine().loadContent(chatText);
             if(selectedIndex!=0) {
                 messageText = "/w " + nickList.getSelectionModel().getSelectedItems().get(0) + " " +messageText;
                 System.out.println("message sent: " + messageText);

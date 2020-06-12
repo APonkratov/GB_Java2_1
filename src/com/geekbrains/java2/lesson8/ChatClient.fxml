@@ -3,10 +3,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.web.WebView?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.2-internal" fx:controller="com.geekbrains.java2.lesson8.ChatController">
    <BorderPane prefHeight="342.0" prefWidth="553.0">
       <center>
-          <TextArea fx:id="messageArea" editable="false" focusTraversable="false" prefHeight="135.0" prefWidth="42.0" BorderPane.alignment="CENTER" />
+          <WebView fx:id="messageArea" focusTraversable="false" prefHeight="135.0" prefWidth="42.0" BorderPane.alignment="CENTER" />
       </center>
       <left>
          <ListView fx:id="nickList" prefHeight="315.0" prefWidth="124.0" BorderPane.alignment="CENTER" />
