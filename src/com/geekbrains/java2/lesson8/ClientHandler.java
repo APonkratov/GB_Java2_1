@@ -60,7 +60,8 @@ public class ClientHandler {
                 }
                 if (message.startsWith("/w ")) {
                     String[] parts = message.split("\\s");
-                    myServer.sendDirect(parts[1],name+ ": "+ parts[2]);
+                    String realMessage = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
+                    myServer.sendDirect(parts[1],name+ ": "+ realMessage);
                 } else myServer.broadcast(name + ": " + message);
             }
         }
