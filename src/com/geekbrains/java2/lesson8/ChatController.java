@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ChatController implements Stageable {
+    private ObservableList<String> nickListItems;
+    private String myNick;
     private Stage stage;
     private Socket socket;
     private DataInputStream in;
@@ -50,7 +52,12 @@ public class ChatController implements Stageable {
                             if (strFromServer.equalsIgnoreCase("/end")) {
                                 break;
                             }
-                            Platform.runLater(()->{ messageArea.appendText(strFromServer + System.lineSeparator());});
+                            if(!strFromServer.startsWith("/")) {
+                                Platform.runLater(()->{ messageArea.appendText(strFromServer + System.lineSeparator());});
+                            } else if(strFromServer.startsWith("/clients ")) {
+                                updateClientsList(strFromServer);
+                            }
+
 
                         }
                     }
@@ -60,20 +67,17 @@ public class ChatController implements Stageable {
             }
         });
         t.start();
-        ObservableList<String> nickListItems = FXCollections.observableArrayList();
+        nickListItems = FXCollections.observableArrayList();
         nickListItems.add("All");
         socket = ChatSceneApp.getScenes().get(SceneFlow.CHAT).getSocket();
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        String myNick = ChatSceneApp.getScenes().get(SceneFlow.CHAT).getNick();
+        myNick = ChatSceneApp.getScenes().get(SceneFlow.CHAT).getNick();
         while (true) {
             if(in.available()>0) {
                 String strFromServer = in.readUTF();
-                if (strFromServer.startsWith("/clients")) {
-                    String[] parts = strFromServer.split("\\s");
-                    for(int i=1; i<parts.length; i++) {
-                        if (!parts[i].equals(myNick)) nickListItems.add(parts[i]);
-                    }
+                if (strFromServer.startsWith("/clients ")) {
+                    updateClientsList(strFromServer);
                     System.out.println("Authorized on server");
                     break;
                 }
@@ -81,6 +85,16 @@ public class ChatController implements Stageable {
         }
         nickList.setItems(nickListItems);
         nickList.getSelectionModel().select(0);
+    }
+
+    private void updateClientsList(String strFromServer) {
+        String[] parts = strFromServer.split("\\s");
+        Platform.runLater(()->{
+            for(int i=1; i<parts.length; i++) {
+                if (!parts[i].equals(myNick)) nickListItems.add(parts[i]);
+            }
+            nickList.setItems(nickListItems);
+        });
     }
 
     public void sendMessageTypeAction(ActionEvent actionEvent) {
@@ -97,7 +111,6 @@ public class ChatController implements Stageable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            messageArea.appendText(messageText+System.lineSeparator());
             newMessage.clear();
         }
     }
@@ -105,5 +118,13 @@ public class ChatController implements Stageable {
     @Override
     public void setStage(Stage stage) {
         this.stage = stage;
+        stage.setOnCloseRequest(event->{
+            try {
+                out.writeUTF("/end");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Platform.exit();
+        });
     }
 }
