@@ -27,6 +27,7 @@ public class ChatController implements Stageable {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private Thread readerThread;
 
     @FXML
     TextArea messageArea;
@@ -41,15 +42,16 @@ public class ChatController implements Stageable {
     ListView nickList;
 
     public void initialize() throws IOException {
-        Thread t = new Thread(new Runnable() {
+        readerThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    while (true & !Thread.interrupted()) {
                         if (in.available()>0) {
                             String strFromServer = in.readUTF();
                             System.out.println("From server: " + strFromServer);
                             if (strFromServer.equalsIgnoreCase("/end")) {
+                                terminateClient();
                                 break;
                             }
                             if(!strFromServer.startsWith("/")) {
@@ -66,7 +68,7 @@ public class ChatController implements Stageable {
                 }
             }
         });
-        t.start();
+        readerThread.start();
         nickListItems = FXCollections.observableArrayList();
         nickListItems.add("All");
         socket = ChatSceneApp.getScenes().get(SceneFlow.CHAT).getSocket();
@@ -85,6 +87,16 @@ public class ChatController implements Stageable {
         }
         nickList.setItems(nickListItems);
         nickList.getSelectionModel().select(0);
+    }
+
+    private void terminateClient() {
+        readerThread.interrupt();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Platform.exit();
     }
 
     private void updateClientsList(String strFromServer) {
@@ -121,6 +133,8 @@ public class ChatController implements Stageable {
         stage.setOnCloseRequest(event->{
             try {
                 out.writeUTF("/end");
+                readerThread.interrupt();
+                socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
