@@ -49,9 +49,10 @@ public class MyServer {
         broadcastClientsList();
     }
 
-    public synchronized void broadcast(String s) {
+    public synchronized void broadcast(String s, boolean addTime) {
+        if (addTime) s += "@" + LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
         for(ClientHandler client: clients) {
-            client.sendMsg(s);
+            client.sendMsg(s );
         }
     }
 
@@ -60,7 +61,7 @@ public class MyServer {
         for (ClientHandler o : clients) {
             sb.append(o.getName() + " ");
         }
-        broadcast(sb.toString());
+        broadcast(sb.toString(), false);
     }
 
     public synchronized boolean isNickLogged(String nick) {
@@ -75,7 +76,8 @@ public class MyServer {
     public void sendDirect(String nick, String message) {
         for (ClientHandler client: clients) {
             if (client.getName().equals(nick)) {
-                client.sendMsg(message);
+                client.sendMsg("(direct) " + message + "@" +
+                        LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
                 return;
             }
         }

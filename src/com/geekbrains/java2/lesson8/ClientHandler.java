@@ -47,7 +47,7 @@ public class ClientHandler {
             ex.printStackTrace();
         }
         myServer.unsubscribe(this);
-        myServer.broadcast("User " + name + " left");
+        myServer.broadcast("User " + name + " left", true);
     }
 
     private void readMessages() throws IOException {
@@ -63,7 +63,7 @@ public class ClientHandler {
                     String[] parts = message.split("\\s");
                     String realMessage = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
                     myServer.sendDirect(parts[1],name+ ": "+ realMessage);
-                } else myServer.broadcast(name + ": " + message);
+                } else myServer.broadcast(name + ": " + message, true);
             }
         }
     }
@@ -80,7 +80,7 @@ public class ClientHandler {
                             System.out.println(nick + " logged into chat");
                             name = nick;
                             sendMsg("/authOk " + nick);
-                            myServer.broadcast(nick + " is in chat");
+                            myServer.broadcast(nick + " is in chat", true);
                             myServer.subscribe(this);
                             return;
                         } else {
