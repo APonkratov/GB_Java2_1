@@ -46,7 +46,7 @@ public class ChatController implements Stageable {
             @Override
             public void run() {
                 try {
-                    while (true & !Thread.interrupted()) {
+                    while (!Thread.interrupted()) {
                         if (in.available()>0) {
                             String strFromServer = in.readUTF();
                             System.out.println("From server: " + strFromServer);
@@ -55,12 +55,10 @@ public class ChatController implements Stageable {
                                 break;
                             }
                             if(!strFromServer.startsWith("/")) {
-                                Platform.runLater(()->{ messageArea.appendText(strFromServer + System.lineSeparator());});
+                                if (!strFromServer.startsWith(myNick+":")) Platform.runLater(()->{ messageArea.appendText(strFromServer + System.lineSeparator());});
                             } else if(strFromServer.startsWith("/clients ")) {
                                 updateClientsList(strFromServer);
                             }
-
-
                         }
                     }
                 } catch (Exception e) {
@@ -80,7 +78,6 @@ public class ChatController implements Stageable {
                 String strFromServer = in.readUTF();
                 if (strFromServer.startsWith("/clients ")) {
                     updateClientsList(strFromServer);
-                    System.out.println("Authorized on server");
                     break;
                 }
             }

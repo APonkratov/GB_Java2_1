@@ -47,7 +47,7 @@ public class ClientHandler {
             ex.printStackTrace();
         }
         myServer.unsubscribe(this);
-        myServer.broadcast("User " + name + "left");
+        myServer.broadcast("User " + name + " left");
     }
 
     private void readMessages() throws IOException {

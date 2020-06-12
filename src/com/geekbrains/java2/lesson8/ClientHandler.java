@@ -47,7 +47,7 @@ public class ClientHandler {
             ex.printStackTrace();
         }
         myServer.unsubscribe(this);
-        myServer.broadcast("User " + name + "left");
+        myServer.broadcast("User " + name + " left");
     }
 
     private void readMessages() throws IOException {
@@ -56,6 +56,7 @@ public class ClientHandler {
                 String message = in.readUTF();
                 System.out.println("From " + name + ":" + message);
                 if (message.equals("/end")) {
+                    closeConnection();
                     return;
                 }
                 if (message.startsWith("/w ")) {
