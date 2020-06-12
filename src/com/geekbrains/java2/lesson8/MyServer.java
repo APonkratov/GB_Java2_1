@@ -1,5 +1,8 @@
 package com.geekbrains.java2.lesson8;
 
+import com.geekbrains.java2.lesson8.auth.AuthenticationService;
+import com.geekbrains.java2.lesson8.auth.PlainAuthService;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,15 +12,15 @@ import java.util.List;
 public class MyServer {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
-    private AuthService authService;
+    private AuthenticationService authService;
 
-    public AuthService getAuthService() {
+    public AuthenticationService getAuthService() {
         return authService;
     }
 
     public MyServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
-            authService = new AuthService();
+            authService = new PlainAuthService();
             authService.start();
             clients = new ArrayList<>();
             while (true) {

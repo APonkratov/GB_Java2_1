@@ -1,10 +1,10 @@
-package com.geekbrains.java2.lesson8;
+package com.geekbrains.java2.lesson8.auth;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuthService {
+public class PlainAuthService implements AuthenticationService {
     Connection conn = null;
 
     private class User {
@@ -21,31 +21,11 @@ public class AuthService {
 
     private List<User> userList;
 
-    public AuthService() {
+    public PlainAuthService() {
         userList = new ArrayList<>();
         userList.add(new User("login1", "pass1", "nick1"));
         userList.add(new User("login2", "pass2", "nick2"));
         userList.add(new User("login3", "pass3", "nick3"));
-
-//        try {
-//            conn = DriverManager.
-//                    getConnection("jdbc:h2:~/test", "sa", "");
-//            Statement statement = conn.createStatement();
-//            ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
-//            while (rs.next()) {
-//                String login = rs.getString("LOGIN");
-//                String passwd = rs.getString("PASSWORD");
-//                String nick = rs.getString("NICK");
-//                userList.add(new User(login, passwd, nick));
-//            }
-//            rs.close();
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-
-//        );
-        // add application code here
-
     }
 
     public void start() {
@@ -53,11 +33,6 @@ public class AuthService {
     }
 
     public void stop() {
-        try {
-            conn.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
         System.out.println("Authentication service stopped");
     }
 

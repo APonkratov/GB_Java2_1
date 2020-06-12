@@ -32,7 +32,7 @@ public class Client {
     private void runOutputLoop(DataOutputStream out) throws IOException {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            String message = scanner.next();
+            String message = scanner.nextLine();
             out.writeUTF(message);
             if (message.equals("/end")) {
                 break;
