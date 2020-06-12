@@ -5,6 +5,8 @@ import javafx.stage.Stage;
 
 import java.net.Socket;
 
+/*Entity for storing scene information*/
+
 public class FxmlInfo {
     private Socket socket;
     private String resource;

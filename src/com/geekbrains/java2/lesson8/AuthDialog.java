@@ -47,6 +47,7 @@ public class AuthDialog implements Stageable {
                     }
                 }
             }
+            stage.setTitle("Chat");
             stage.setScene(ChatSceneApp.getScenes().get(SceneFlow.CHAT).getScene());
         } catch (IOException ex) {
             ex.printStackTrace();

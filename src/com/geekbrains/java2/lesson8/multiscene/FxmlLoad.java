@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import java.io.IOException;
 import java.net.URL;
 
+/* Loads UI from fxml file into corresponding scene entity*/
+
 public class FxmlLoad {
     public Scene load(FxmlInfo info) {
         if(info.hasScene()) {
