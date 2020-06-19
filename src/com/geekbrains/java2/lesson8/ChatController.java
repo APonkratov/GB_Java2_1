@@ -10,9 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
@@ -41,41 +39,36 @@ public class ChatController implements Stageable {
     Button sendButton;
 
     @FXML
-    ListView nickList;
+    ListView<String> nickList;
 
     public void initialize() throws IOException {
-        readerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (!Thread.interrupted()) {
-                        if (in.available()>0) {
-                            String strFromServer = in.readUTF();
-                            System.out.println("From server: " + strFromServer);
-                            if (strFromServer.equalsIgnoreCase("/end")) {
-                                terminateClient();
-                                break;
-                            }
-                            if(!strFromServer.startsWith("/")) {
-                                if (!strFromServer.startsWith(myNick+":")) {
-                                    if(strFromServer.startsWith("(direct)")) {
-                                        chatText += "<p style='background-color:powderblue;'>" +
-                                                strFromServer.substring(strFromServer.indexOf(")") + 2) + "</p>";
-                                    } else {
-                                        chatText += "<p>" + strFromServer + "</p>";
-                                    }
-                                    Platform.runLater(()->{
-                                        messageArea.getEngine().loadContent(chatText);
-                                    });
+        readerThread = new Thread(() -> {
+            try {
+                while (!Thread.interrupted()) {
+                    if (in.available()>0) {
+                        String strFromServer = in.readUTF();
+                        System.out.println("From server: " + strFromServer);
+                        if (strFromServer.equalsIgnoreCase("/end")) {
+                            terminateClient();
+                            break;
+                        }
+                        if(!strFromServer.startsWith("/")) {
+                            if (!strFromServer.startsWith(myNick+":")) {
+                                if(strFromServer.startsWith("(direct)")) {
+                                    chatText += "<p style='background-color:powderblue;'>" +
+                                            strFromServer.substring(strFromServer.indexOf(")") + 2) + "</p>";
+                                } else {
+                                    chatText += "<p>" + strFromServer + "</p>";
                                 }
-                            } else if(strFromServer.startsWith("/clients ")) {
-                                updateClientsList(strFromServer);
+                                Platform.runLater(()-> messageArea.getEngine().loadContent(chatText));
                             }
+                        } else if(strFromServer.startsWith("/clients ")) {
+                            updateClientsList(strFromServer);
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         readerThread.start();

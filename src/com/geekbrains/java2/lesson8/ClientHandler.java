@@ -8,9 +8,11 @@ import java.net.Socket;
 public class ClientHandler {
     private MyServer myServer;
     private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private DataInputStream dataInputStream;
+    private DataOutputStream dataOutputStream;
     private String name;
+
+    public static final long TIMEOUT = 120000;
 
     public String getName() {
         return name;
@@ -21,8 +23,8 @@ public class ClientHandler {
         this.socket = socket;
         this.name = "";
         try {
-            this.in = new DataInputStream(socket.getInputStream());
-            this.out = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
             new Thread(()-> {
                 try {
                     authenticate();
@@ -40,8 +42,8 @@ public class ClientHandler {
 
     private void closeConnection() {
         try {
-            in.close();
-            out.close();
+            dataInputStream.close();
+            dataOutputStream.close();
             socket.close();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -52,8 +54,8 @@ public class ClientHandler {
 
     private void readMessages() throws IOException {
         while (true) {
-            if (in.available()>0) {
-                String message = in.readUTF();
+            if (dataInputStream.available()>0) {
+                String message = dataInputStream.readUTF();
                 System.out.println("From " + name + ":" + message);
                 if (message.equals("/end")) {
                     closeConnection();
@@ -69,37 +71,41 @@ public class ClientHandler {
     }
 
     private void authenticate() throws IOException {
-        while(true) {
-            if (in.available()>0){
-                String str = in.readUTF();
-                if (str.startsWith("/auth")) {
-                    String[] parts = str.split("\\s");
-                    String nick = myServer.getAuthService().getNickByLoginAndPwd(parts[1], parts[2]);
-                    if (nick != null) {
-                        if (!myServer.isNickLogged(nick)) {
-                            System.out.println(nick + " logged into chat");
-                            name = nick;
-                            sendMsg("/authOk " + nick);
-                            myServer.broadcast(nick + " is in chat", true);
-                            myServer.subscribe(this);
-                            return;
-                        } else {
-                            System.out.println("User " + nick + " tried to re-enter");
-                            sendMsg("User already logged in");
+        long standbyTime = System.currentTimeMillis() + TIMEOUT;
+        while (socket.isConnected()) {
+            if (System.currentTimeMillis() > standbyTime) {
+                System.out.println("Authorisation timeout");
+                sendMsg("/end");
+                closeConnection();
+                return;
+            } else {
+                if (dataInputStream.available() > 0) {
+                    String str = dataInputStream.readUTF();
+                    if (str.startsWith("/auth")) {
+                        String[] parts = str.split("\\s");
+                        String nick = myServer.getAuthService().getNickByLoginAndPwd(parts[1], parts[2]);
+                        if (nick != null) {
+                            if (!myServer.isNickLogged(nick)) {
+                                System.out.println(nick + " logged into chat");
+                                name = nick;
+                                sendMsg("/authOk " + nick);
+                                myServer.broadcast(nick + " is in chat",true);
+                                myServer.subscribe(this);
+                                return;
+                            } else {
+                                System.out.println("Wrong login/password");
+                                sendMsg("Incorrect login attempted");
+                            }
                         }
-                    } else {
-                        System.out.println("Wrong login/password");
-                        sendMsg("Incorrect login attempted");
                     }
                 }
             }
-
         }
     }
 
     public void sendMsg(String s) {
         try {
-            out.writeUTF(s);
+            dataOutputStream.writeUTF(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
